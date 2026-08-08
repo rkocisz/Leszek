@@ -157,7 +157,7 @@ public:
         return result;
     }
 
-    Matrix sumColumns()
+    Matrix sumColumns() const
     {
         Matrix result(rows, 1);
 
@@ -169,6 +169,20 @@ public:
             }
         }
 
+        return result;
+    }
+
+    Matrix getColumns(int startIndex, int columnCount) const
+    {
+        Matrix result(rows, columnCount);
+
+        for (int i = startIndex; i < startIndex + columnCount; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                result.at(j, i - startIndex) = at(j, i);
+            }
+        }
         return result;
     }
 

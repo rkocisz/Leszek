@@ -22,7 +22,7 @@ public:
 		bias.zero();
 	}
 
-	Matrix forward(const Matrix& input_, bool isOutputLayer)
+	Matrix forward(const Matrix& input_, bool isOutputLayer) // inputy są w kolumnach
 	{
 		input = input_;
 
