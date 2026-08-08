@@ -22,7 +22,7 @@ public:
 		bias.zero();
 	}
 
-	Matrix forward(const Matrix& input_)
+	Matrix forward(const Matrix& input_, bool isOutputLayer)
 	{
 		input = input_;
 
@@ -30,9 +30,33 @@ public:
 		output = output.addBiasBroadcast(bias);
 		preActivation = output;
 
-		output = output.doReLU();
+		if(!isOutputLayer)
+			output = output.doReLU(); //jak output layer to skipujemy ReLU
+		
 		postActivation = output;
 
 		return output;
+	}
+
+	Matrix backward(const Matrix& influenceOnNextLayer, double learningRate, bool isOutputLayer)
+	{
+		Matrix delta;
+		if (isOutputLayer)
+			delta = influenceOnNextLayer; // skipujemy pochodną ReLU
+		else
+			delta = influenceOnNextLayer.hadamard(preActivation.doReLU_Derivative());
+
+		Matrix weightGradients = delta.multiply(input.transpose());
+		Matrix biasGradients = delta.sumColumns();
+
+		weightGradients = weightGradients.multiplyScalar(1.0 / influenceOnNextLayer.cols);
+		biasGradients = biasGradients.multiplyScalar(1.0 / influenceOnNextLayer.cols);
+
+		Matrix prevLayerInfluence = weights.transpose().multiply(delta);
+
+		weights = weights.subtract(weightGradients.multiplyScalar(learningRate));
+		bias = bias.subtract(biasGradients.multiplyScalar(learningRate));
+
+		return prevLayerInfluence;
 	}
 };

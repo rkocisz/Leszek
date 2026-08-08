@@ -157,6 +157,21 @@ public:
         return result;
     }
 
+    Matrix sumColumns()
+    {
+        Matrix result(rows, 1);
+
+        for (int i = 0; i < cols; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                result.at(j, 0) += at(j, i);
+            }
+        }
+
+        return result;
+    }
+
     Matrix doReLU()
     {
         Matrix result(rows, cols);
@@ -165,6 +180,20 @@ public:
             for (int j = 0; j < cols; j++)
             {
                 result.at(i, j) = ReLU(at(i, j));
+            }
+        }
+
+        return result;
+    }
+
+    Matrix doReLU_Derivative()
+    {
+        Matrix result(rows, cols);
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result.at(i, j) = ReLU_Derivative(at(i, j));
             }
         }
 
@@ -188,7 +217,13 @@ private:
 
     double ReLU(double x)
     {
-        if (x < 0) return 0;
-        return x;
+        if (x > 0) return x;
+        return 0;
+    }
+
+    double ReLU_Derivative(double x)
+    {
+        if(x > 0) return 1;
+        return 0;
     }
 };
