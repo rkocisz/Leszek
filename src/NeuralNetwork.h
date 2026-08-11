@@ -3,6 +3,48 @@
 #include "Layer.h"
 #include "Matrix.h"
 #include <cmath>
+#include <fstream>
+
+inline Matrix softMax(const Matrix& preActivationOutput)
+{
+	Matrix result = preActivationOutput;
+	double sum = 0;
+
+	for (int i = 0; i < result.cols; i++)
+	{
+		for (int j = 0; j < result.rows; j++)
+		{
+			result.at(j, i) = std::exp(result.at(j, i));
+			sum += result.at(j, i);
+		}
+		for (int j = 0; j < result.rows; j++)
+		{
+			result.at(j, i) /= sum;
+		}
+		sum = 0;
+	}
+	return result;
+}
+
+inline double crossEntropyLoss(const Matrix& guess, const Matrix& target)
+{
+	double result = 0;
+
+	for (int i = 0; i < guess.cols; i++)
+	{
+		for (int j = 0; j < guess.rows; j++)
+		{
+			if (target.at(j, i) == 1)
+			{
+				result -= std::log(guess.at(j, i));
+				break;
+			}
+		}
+	}
+	result /= guess.cols;
+
+	return result;
+}
 
 class NeuralNetwork
 {
@@ -70,46 +112,37 @@ public:
 		}
 	}
 
-
-};
-
-Matrix softMax(const Matrix& preActivationOutput)
-{
-	Matrix result = preActivationOutput;
-	double sum = 0;
-
-	for (int i = 0; i < result.cols; i++)
+	void saveToFile(std::string fileName)
 	{
-		for (int j = 0; j < result.rows; j++)
-		{
-			result.at(j, i) = std::exp(result.at(j, i));
-			sum += result.at(j, i);
-		}
-		for (int j = 0; j < result.rows; j++)
-		{
-			result.at(j, i) /= sum;
-		}
-		sum = 0;
-	}
-	return result;
-}
+		std::ofstream file(fileName);
 
-double crossEntropyLoss(const Matrix& guess, const Matrix& target)
-{
-	double result = 0;
+		file << layers.size() << "\n";
+
+		for (int i = 0; i < layers.size(); i++)
+		{
+			layers[i].saveToStream(file);
+		}
+
+		file.close();
+	}
+
+	void loadFromFile(std::string fileName)
+	{
+		std::ifstream file(fileName);
+		
+		int layers_;
+		file >> layers_;
+		if (layers.size() != layers_)
+		{
+			std::cout << "zla liczba layerow";
+			return;
+		}
+		
+		for (int i = 0; i < layers.size(); i++)
+		{
+			layers[i].loadFromStream(file);
+		}
 	
-	for (int i = 0; i < guess.cols; i++)
-	{
-		for (int j = 0; j < guess.rows; j++)
-		{
-			if (target.at(j, i) == 1)
-			{
-				result -= std::log(guess.at(j, i));
-				break;
-			}
-		}
+		file.close();
 	}
-	result /= guess.cols;
-
-	return result;
-}
+};

@@ -226,6 +226,35 @@ public:
         }
     }
 
+    void saveToStream(std::ostream& out) const
+    {
+        out << rows << " " << cols << "\n";
+
+        for (int i = 0; i < data.size(); i++)
+        {
+            out << data[i] << " ";
+        }
+        out << "\n";
+    }
+
+    static Matrix loadFromStream(std::istream& in)
+    {
+        Matrix result;
+
+        in >> result.rows;
+        in >> result.cols;
+
+        int size = result.rows * result.cols;
+        result.data.resize(size, 0.0);
+
+        for (int i = 0; i < size; i++)
+        {
+            in >> result.data[i];
+        }
+
+        return result;
+    }
+
     
 private:
 

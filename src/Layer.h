@@ -59,4 +59,16 @@ public:
 
 		return prevLayerInfluence;
 	}
+
+	void saveToStream(std::ostream& out) const
+	{
+		weights.saveToStream(out);
+		bias.saveToStream(out);
+	}
+
+	void loadFromStream(std::istream& in)
+	{
+		weights = Matrix::loadFromStream(in);
+		bias = Matrix::loadFromStream(in);
+	}
 };
